@@ -1,0 +1,362 @@
+---
+title: "SDS 315 HW 2"
+author: "Ryan Paul Clarance"
+date: "2025-01-28"
+output: pdf_document
+---
+
+GitHub Link : https://github.com/RPC777/Homework-2
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(tidyverse)
+bikeshare <- read_csv("Desktop/SDS 313/bikeshare.csv")
+head(bikeshare)
+profs <- read_csv("Desktop/SDS 313/profs.csv")
+capmetro_UT <- read_csv("Desktop/SDS 313/capmetro_UT.csv")
+head(capmetro_UT)
+head(profs)
+billboard <- read_csv("Desktop/SDS 313/billboard.csv")
+head(billboard)
+```
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Problem 1:
+
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Part A: Histogram of Course Evaluation Scores
+
+```{r}
+
+ggplot(profs, aes(x = eval)) +
+  geom_histogram(binwidth = 0.25, fill = "steelblue", color = "black") +
+  labs(
+    title = "Distribution of Course Evaluation Scores",
+    x = "Evaluation Score",
+    y = "Frequency"
+  ) +
+  theme_minimal()
+```
+*Figure 1: The histogram displays the distribution of course evaluation scores, showing the central data and spread.*
+
+
+\newpage
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Part B: Boxplots by Native English Speaker Status
+
+```{r}
+ggplot(profs, aes(x = native, y = eval, fill = native)) +
+  geom_boxplot() +
+  labs(
+    title = "Course Evaluation Scores by Native English Speaker Status",
+    x = "Native English Speaker",
+    y = "Evaluation Score"
+  ) +
+  scale_fill_manual(values = c("yes" = "coral", "no" = "cyan")) +
+  theme_minimal()
+```
+*Figure 2: These Boxplots show differences in course evaluation scores between native and non-native English-speaking professors.*
+
+
+\newpage
+
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Part C: Faceted Histograms by Gender
+
+```{r}
+ggplot(profs, aes(x = eval, fill = gender)) +
+  geom_histogram(binwidth = 0.25, color = "black", alpha = 0.7) +
+  facet_wrap(~ gender, nrow = 2) +
+  labs(
+    title = "Distribution of Course Evaluation Scores by Gender",
+    x = "Evaluation Score",
+    y = "Frequency"
+  ) +
+  scale_fill_manual(values = c("male" = "blue", "female" = "pink")) +
+  theme_minimal()
+```
+*Figure 3: These Histograms compare the distribution of course evaluation scores for male and female instructors.*
+
+
+\newpage
+
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Part D: Scatterplot of Physical Attractiveness and Evaluation Scores
+
+```{r}
+ggplot(profs, aes(x = beauty, y = eval)) +
+  geom_point(alpha = 0.6, color = "darkgreen") +
+  geom_smooth(method = "lm", se = FALSE, color = "red") +
+  labs(
+    title = "Relationship Between Physical Attractiveness and Evaluation Scores",
+    x = "Physical Attractiveness (Standardized)",
+    y = "Evaluation Score"
+  ) +
+  theme_minimal()
+```
+*Figure 4: This Scatterplot explores the potential relationship between a professor's physical attractiveness and their course evaluation scores.*
+
+
+\newpage
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Problem 2:
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Plot A:
+
+```{r}
+plot_a_data <- bikeshare |>
+  group_by(hr) |>
+  summarize(avg_rentals = mean(total, na.rm = TRUE))
+
+# Create Plot A
+ggplot(plot_a_data, aes(x = hr, y = avg_rentals)) +
+  geom_line(color = "blue") +
+  geom_point(color = "blue") +
+  labs(
+    title = "Plot A: Average Hourly Bike Rentals (Across All Days)",
+    x = "Hour of the Day",
+    y = "Average Rentals"
+  ) +
+  theme_minimal()
+```
+
+*This plot shows the average number of bike rentals by hour of the day across all days in the dataset. The x-axis represents the hour of the day (0–23), and the y-axis represents the average number of rentals. A clear trend is shown, with peak rentals during commuting hours (8–9 AM and 5–6 PM).*
+
+\newpage
+
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Plot B:
+```{r}
+plot_b_data <- bikeshare |>
+  group_by(hr, workingday) |>
+  summarize(avg_rentals = mean(total, na.rm = TRUE))
+
+# Create Plot B
+ggplot(plot_b_data, aes(x = hr, y = avg_rentals, color = factor(workingday))) +
+  geom_line() +
+  facet_wrap(~ workingday, labeller = labeller(workingday = c("0" = "Non-Working Day", "1" = "Working Day"))) +
+  labs(
+    title = "Plot B: Average Hourly Bike Rentals by Working Day",
+    x = "Hour of the Day",
+    y = "Average Rentals",
+    color = "Working Day"
+  ) +
+  theme_minimal()
+```
+
+*This  plot shows the average hourly bike rentals for working and non-working days. Each panel represents a category of working day (working or non-working). The x-axis is the hour of the day (0–23), and the y-axis is the average number of rentals. On working days, rental peaks occur during typical commuting hours (8–9 AM and 5–6 PM), while on non-working days, rentals are more evenly distributed, with a peak around mid-morning*
+
+\newpage
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Plot C:
+
+```{r}
+# Filter data for 9 AM and calculate averages by weather and working day
+plot_c_data <- bikeshare |>
+  filter(hr == 9) |>
+  group_by(weathersit, workingday) |>
+  summarize(avg_rentals = mean(total, na.rm = TRUE))
+
+ggplot(plot_c_data, aes(x = factor(weathersit), y = avg_rentals, fill = factor(weathersit))) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~ workingday, labeller = labeller(workingday = c("0" = "Non-Working Day", "1" = "Working Day"))) +
+  labs(
+    title = "Plot C: Rentals at 9 AM by Weather and Working Day",
+    x = "Weather Situation",
+    y = "Average Rentals",
+    fill = "Weather"
+  ) +
+  scale_x_discrete(labels = c("1" = "Clear", "2" = "Mist", "3" = "Light Snow/Rain", "4" = "Heavy Rain/Snow")) +
+  theme_minimal()
+```
+
+*This faceted bar plot shows the average number of rentals at 9 AM, grouped by weather conditions (x-axis) and categorized by working or non-working days. Weather conditions range from clear (1) to heavy rain/snow (4). Rentals are higher in better weather and on working days compared to non-working days.*
+
+\newpage
+
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Problem 3:
+
+```{r}
+capmetro_UT <- capmetro_UT |>
+  mutate(
+    day_of_week = factor(day_of_week, levels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")),
+    month = factor(month, levels = c("Sep", "Oct", "Nov"))
+  )
+```
+
+
+
+Question 1: Faceted Line Graph for Average Boardings
+
+```{r}
+# Wrangle data for average boardings
+avg_boardings <- capmetro_UT |>
+  group_by(day_of_week, month, hour_of_day) |>
+  summarize(avg_boardings = mean(boarding, na.rm = TRUE))
+
+# Plot the faceted line graph
+ggplot(avg_boardings, aes(x = hour_of_day, y = avg_boardings, color = month)) +
+  geom_line(size = 1) +
+  facet_wrap(~day_of_week, scales = "free_y") +
+  labs(
+    title = "Average Boardings by Hour of Day, Day of Week, and Month",
+    x = "Hour of Day",
+    y = "Average Boardings",
+    color = "Month"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    strip.text = element_text(size = 10)
+  )
+```
+
+
+*Hour of Peak Boardings: The hour of peak boardings remains mostly consistent across all days, peaking during hours (8–9 AM and 5–6 PM). Lower Average Boardings on Mondays in September could be due to fewer students on campus during the initial days of the semester. Decline in Boardings on Wednesday–Friday in November: where this could be reflected based on a reduced number of students on campus or a decrease in service due to the Thanksgiving break*
+
+\newpage
+
+
+Question 2:
+
+```{r}
+# Add weekend status for scatter plot
+capmetro_UT <- capmetro_UT |>
+  mutate(weekend_status = ifelse(weekend == 1, "Weekend", "Weekday"))
+
+# Plot the faceted scatter plot
+ggplot(capmetro_UT, aes(x = temperature, y = boarding, color = weekend_status)) +
+  geom_point(alpha = 0.6) +
+  facet_wrap(~hour_of_day, scales = "free_y") +
+  labs(
+    title = "Boardings vs. Temperature by Hour of Day and Weekend Status",
+    x = "Temperature (°F)",
+    y = "Boardings",
+    color = "Weekend Status"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    strip.text = element_text(size = 10)
+  )
+```
+
+*Temperature Effect on Ridership: Temperature has an effect on ridership, especially in the early morning and late evening hours, with higher temperatures correlating with increased boardings.The effect of temperature is more  on weekdays, as weekday riding  follows commuting patterns.*
+
+
+\newpage
+
+
+
+```{r}
+billboard_data <- billboard |>
+  mutate(
+    year = as.numeric(year),
+    week_position = as.numeric(week_position)
+  )
+```
+
+
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Problem 4:
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Part A: Top 10 Most Popular Songs by Total Weeks on Billboard Top 100
+
+```{r}
+# Calculate total weeks for each song
+top_songs <- billboard_data |>
+  group_by(performer, song) |>
+  summarize(total_weeks = n(), .groups = "drop") |>
+  arrange(desc(total_weeks)) |>
+  slice(1:10)
+
+# Display the table
+knitr::kable(
+  top_songs,
+  col.names = c("Performer", "Song", "Total Weeks"),
+  caption = "Top 10 most popular songs based on total weeks on Billboard Top 100 since 1958."
+)
+```
+
+*Table 1: This table lists the top 10 most popular songs based on their total weeks on the Billboard Top 100 since 1958. It includes the performer, song title, and total weeks on the chart.*
+
+\newpage
+
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Part B: Musical Diversity Over Time
+
+```{r}
+# Filter data and count unique songs per year
+musical_diversity <- billboard_data |>
+  filter(year > 1958 & year < 2021) |>
+  group_by(year) |>
+  summarize(unique_songs = n_distinct(song), .groups = "drop")
+
+# Plot musical diversity over time
+ggplot(musical_diversity, aes(x = year, y = unique_songs)) +
+  geom_line(color = "steelblue", size = 1) +
+  labs(
+    title = "Musical Diversity of Billboard Top 100 Over Time",
+    x = "Year",
+    y = "Number of Unique Songs",
+    caption = "This figure shows the number of unique songs on the Billboard Top 100 per year (1959–2020)."
+  ) +
+  theme_minimal()
+```
+
+*Figure 1: This line graph illustrates the number of unique songs appearing on the Billboard Top 100 for each year from 1959 to 2020. A trend of increasing musical diversity is observed.*
+
+\newpage
+
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Part C: Artists with the Most Ten-Week Hits
+
+```{r}
+# Identify ten-week hits
+ten_week_hits <- billboard_data |>
+  group_by(performer, song) |>
+  summarize(total_weeks = n(), .groups = "drop") |>
+  filter(total_weeks >= 10)
+
+# Count ten-week hits per artist
+artists_hits <- ten_week_hits |>
+  group_by(performer) |>
+  summarize(ten_week_hits_count = n(), .groups = "drop") |>
+  filter(ten_week_hits_count >= 30) |>
+  arrange(desc(ten_week_hits_count))
+
+# Plot bar chart for artists with the most ten-week hits
+ggplot(artists_hits, aes(x = fct_reorder(performer, ten_week_hits_count), y = ten_week_hits_count)) +
+  geom_bar(stat = "identity", fill = "darkorange") +
+  coord_flip() +
+  labs(
+    title = "Artists with the Most Ten-Week Hits",
+    x = "Artist",
+    y = "Number of Ten-Week Hits",
+    caption = "This figure shows the 19 artists with at least 30 ten-week hits on the Billboard Top 100 since 1958."
+  ) +
+  theme_minimal()
+```
+
+
+*Figure 2: This bar chart displays the 19 artists with at least 30 ten-week hits on the Billboard Top 100 since 1958, showcasing their significant impact on the music industry.*
+
+
+
