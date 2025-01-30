@@ -41,7 +41,7 @@ ggplot(profs, aes(x = eval)) +
   ) +
   theme_minimal()
 ```
-*Figure 1: The histogram displays the distribution of course evaluation scores, showing the central data and spread.*
+*Figure 1: This histogram shows how the values of the numeric variable are spread out. The taller bars indicate the most common values in the dataset. If the bars are mostly concentrated on one side, the data may be skewed. If the distribution is symmetric, it suggests a normal distribution. Understanding this spread helps in identifying trends and outliers.*
 
 
 \newpage
@@ -60,7 +60,7 @@ ggplot(profs, aes(x = native, y = eval, fill = native)) +
   scale_fill_manual(values = c("yes" = "coral", "no" = "cyan")) +
   theme_minimal()
 ```
-*Figure 2: These Boxplots show differences in course evaluation scores between native and non-native English-speaking professors.*
+*Figure 2: This boxplot helps understand the range and spread of the numeric data. The box shows the middle 50% of the data, with the median marked by a line inside. The whiskers show the overall range, while dots outside them indicate values that are significantly higher or lower than the rest. This visualization helps in spotting anomalies and understanding variability.*
 
 
 \newpage
@@ -81,7 +81,7 @@ ggplot(profs, aes(x = eval, fill = gender)) +
   scale_fill_manual(values = c("male" = "blue", "female" = "pink")) +
   theme_minimal()
 ```
-*Figure 3: These Histograms compare the distribution of course evaluation scores for male and female instructors.*
+*Figure 3: This histogram displays the distribution of course evaluation scores for male and female professors. The x-axis represents the evaluation scores, while the y-axis shows how frequently each score appears. The two separate facets allow us to compare the distributions for each gender. If the bars are more concentrated towards the higher or lower end, it suggests a trend in how students rate professors based on gender. This visualization helps in identifying any noticeable patterns or disparities in evaluations.*
 
 
 \newpage
@@ -101,7 +101,7 @@ ggplot(profs, aes(x = beauty, y = eval)) +
   ) +
   theme_minimal()
 ```
-*Figure 4: This Scatterplot explores the potential relationship between a professor's physical attractiveness and their course evaluation scores.*
+*Figure 4: This scatter plot shows how a professor’s physical attractiveness relates to their evaluation scores. Each point represents a professor, with their attractiveness score on the x-axis and their evaluation score on the y-axis. The red line shows the trend—if it slopes upward, it means higher attractiveness is linked to higher evaluations. The spread of points helps us see whether this relationship is strong or weak.*
 
 
 \newpage
@@ -225,7 +225,7 @@ ggplot(avg_boardings, aes(x = hour_of_day, y = avg_boardings, color = month)) +
 ```
 
 
-*Hour of Peak Boardings: The hour of peak boardings remains mostly consistent across all days, peaking during hours (8–9 AM and 5–6 PM). Lower Average Boardings on Mondays in September could be due to fewer students on campus during the initial days of the semester. Decline in Boardings on Wednesday–Friday in November: where this could be reflected based on a reduced number of students on campus or a decrease in service due to the Thanksgiving break*
+*This line graph shows the average number of boardings at different hours of the day, broken down by day of the week and month. The busiest times are usually in the morning (8–9 AM) and evening (5–6 PM), likely due to students commuting to and from campus. Mondays in September have noticeably fewer boardings, possibly because fewer students are on campus at the start of the semester. There’s also a drop in boardings from Wednesday to Friday in November, which could be due to students leaving early for Thanksgiving break or a reduced bus schedule*
 
 \newpage
 
@@ -254,7 +254,7 @@ ggplot(capmetro_UT, aes(x = temperature, y = boarding, color = weekend_status)) 
   )
 ```
 
-*Temperature Effect on Ridership: Temperature has an effect on ridership, especially in the early morning and late evening hours, with higher temperatures correlating with increased boardings.The effect of temperature is more  on weekdays, as weekday riding  follows commuting patterns.*
+*Temperature Effect on Ridership is where Temperature has an effect on ridership, especially in the early morning and late evening hours, with higher temperatures correlating with increased boardings.The effect of temperature is more on weekdays, as weekday riding  follows commuting patterns.*
 
 
 \newpage
