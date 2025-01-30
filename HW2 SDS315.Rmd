@@ -24,18 +24,18 @@ head(billboard)
 ```
 
 <span style="font-family: Arial; font-size: 14pt; color: red;">
-Problem 1:
+Question 1:
 
 
 <span style="font-family: Arial; font-size: 14pt; color: red;">
-Part A: Histogram of Course Evaluation Scores
+Part A: Histogram
 
 ```{r}
 
 ggplot(profs, aes(x = eval)) +
   geom_histogram(binwidth = 0.25, fill = "steelblue", color = "black") +
   labs(
-    title = "Distribution of Course Evaluation Scores",
+    title = "Course Evaluation Scores Distribution",
     x = "Evaluation Score",
     y = "Frequency"
   ) +
@@ -47,7 +47,7 @@ ggplot(profs, aes(x = eval)) +
 \newpage
 
 <span style="font-family: Arial; font-size: 14pt; color: red;">
-Part B: Boxplots by Native English Speaker Status
+Part B: Boxplots 
 
 ```{r}
 ggplot(profs, aes(x = native, y = eval, fill = native)) +
@@ -60,35 +60,35 @@ ggplot(profs, aes(x = native, y = eval, fill = native)) +
   scale_fill_manual(values = c("yes" = "coral", "no" = "cyan")) +
   theme_minimal()
 ```
-*Figure 2: This boxplot helps understand the range and spread of the numeric data. The box shows the middle 50% of the data, with the median marked by a line inside. The whiskers show the overall range, while dots outside them indicate values that are significantly higher or lower than the rest. This visualization helps in spotting anomalies and understanding variability.*
+*Figure 2: This boxplot helps understand the range and spread of the numeric data. The box shows the middle 50% of the data, with the median marked by a line inside. The whiskers show the overall range, while dots outside them indicate values that are significantly higher or lower than the rest. This visualization helps in spotting anomalies and understanding vairables individually.*
 
 
 \newpage
 
 
 <span style="font-family: Arial; font-size: 14pt; color: red;">
-Part C: Faceted Histograms by Gender
+Part C: Histograms
 
 ```{r}
 ggplot(profs, aes(x = eval, fill = gender)) +
   geom_histogram(binwidth = 0.25, color = "black", alpha = 0.7) +
   facet_wrap(~ gender, nrow = 2) +
   labs(
-    title = "Distribution of Course Evaluation Scores by Gender",
+    title = "Distribution of Course Evaluation Scores based on Gender",
     x = "Evaluation Score",
     y = "Frequency"
   ) +
   scale_fill_manual(values = c("male" = "blue", "female" = "pink")) +
   theme_minimal()
 ```
-*Figure 3: This histogram displays the distribution of course evaluation scores for male and female professors. The x-axis represents the evaluation scores, while the y-axis shows how frequently each score appears. The two separate facets allow us to compare the distributions for each gender. If the bars are more concentrated towards the higher or lower end, it suggests a trend in how students rate professors based on gender. This visualization helps in identifying any noticeable patterns or disparities in evaluations.*
+*Figure 3: This histogram shows the distribution of the evaluation scores for male and female professors. The x-axis shows the scores, while the y-axis shows the frequency of each score. The two separate facets allow us to compare the distributions for each gender. If the bars are more concentrated towards the higher or lower end, it suggests a trend in how students rate professors based on gender. This visualization helps in identifying any noticeable patterns or disparities in evaluations.*
 
 
 \newpage
 
 
 <span style="font-family: Arial; font-size: 14pt; color: red;">
-Part D: Scatterplot of Physical Attractiveness and Evaluation Scores
+Part D: Scatterplots
 
 ```{r}
 ggplot(profs, aes(x = beauty, y = eval)) +
@@ -101,13 +101,13 @@ ggplot(profs, aes(x = beauty, y = eval)) +
   ) +
   theme_minimal()
 ```
-*Figure 4: This scatter plot shows how a professor’s physical attractiveness relates to their evaluation scores. Each point represents a professor, with their attractiveness score on the x-axis and their evaluation score on the y-axis. The red line shows the trend—if it slopes upward, it means higher attractiveness is linked to higher evaluations. The spread of points helps us see whether this relationship is strong or weak.*
+*Figure 4: This scatter plot shows how the physical attractiveness of a professor relates to their evaluation scores. Each point represents a professor, with their attractiveness score on the x-axis and their evaluation score on the y-axis. The red line shows the trend—if it slopes upward, it means higher attractiveness is linked to higher evaluations. The spread of points helps us see whether this relationship is strong or weak.*
 
 
 \newpage
 
 <span style="font-family: Arial; font-size: 14pt; color: red;">
-Problem 2:
+Question 2:
 
 <span style="font-family: Arial; font-size: 14pt; color: red;">
 Plot A:
@@ -122,20 +122,19 @@ ggplot(plot_a_data, aes(x = hr, y = avg_rentals)) +
   geom_line(color = "blue") +
   geom_point(color = "blue") +
   labs(
-    title = "Plot A: Average Hourly Bike Rentals (Across All Days)",
+    title = "Plot A: Average Hourly Bike Rentals",
     x = "Hour of the Day",
     y = "Average Rentals"
   ) +
   theme_minimal()
 ```
 
-*This plot shows the average number of bike rentals by hour of the day across all days in the dataset. The x-axis represents the hour of the day (0–23), and the y-axis represents the average number of rentals. A clear trend is shown, with peak rentals during commuting hours (8–9 AM and 5–6 PM).*
+*This scatterplot shows the average number of bike rentals by hour of the day for all days in the dataset. The x-axis represents the hour of the day from 0-23, and the y-axis represents the average number of rentals. A clear trend is shown, with peak rentals during commuting hours that are from 8–9 AM and 5–6 PM.*
 
 \newpage
 
 
-<span style="font-family: Arial; font-size: 14pt; color: red;">
-Plot B:
+
 ```{r}
 plot_b_data <- bikeshare |>
   group_by(hr, workingday) |>
@@ -146,15 +145,15 @@ ggplot(plot_b_data, aes(x = hr, y = avg_rentals, color = factor(workingday))) +
   geom_line() +
   facet_wrap(~ workingday, labeller = labeller(workingday = c("0" = "Non-Working Day", "1" = "Working Day"))) +
   labs(
-    title = "Plot B: Average Hourly Bike Rentals by Working Day",
-    x = "Hour of the Day",
+    title = "Plot B: Average Hourly Bike Rentals based on Working Day",
+    x = "Hour",
     y = "Average Rentals",
     color = "Working Day"
   ) +
   theme_minimal()
 ```
 
-*This  plot shows the average hourly bike rentals for working and non-working days. Each panel represents a category of working day (working or non-working). The x-axis is the hour of the day (0–23), and the y-axis is the average number of rentals. On working days, rental peaks occur during typical commuting hours (8–9 AM and 5–6 PM), while on non-working days, rentals are more evenly distributed, with a peak around mid-morning*
+*This  plot shows the average hourly bike rentals based on working and non-working days. Each panel represents a category of working day (working or non-working). The x-axis represents the hour of the day from 0-23, and the y-axis is the average number of rentals. On working days, rental peaks occur during commuting hours from 8–9 AM and 5–6 P), while on non-working days, based on the graph, rentals are more evenly distributed, with a rise around mid-morning*
 
 \newpage
 
@@ -173,7 +172,7 @@ ggplot(plot_c_data, aes(x = factor(weathersit), y = avg_rentals, fill = factor(w
   facet_wrap(~ workingday, labeller = labeller(workingday = c("0" = "Non-Working Day", "1" = "Working Day"))) +
   labs(
     title = "Plot C: Rentals at 9 AM by Weather and Working Day",
-    x = "Weather Situation",
+    x = "Weather Condition",
     y = "Average Rentals",
     fill = "Weather"
   ) +
@@ -181,13 +180,13 @@ ggplot(plot_c_data, aes(x = factor(weathersit), y = avg_rentals, fill = factor(w
   theme_minimal()
 ```
 
-*This faceted bar plot shows the average number of rentals at 9 AM, grouped by weather conditions (x-axis) and categorized by working or non-working days. Weather conditions range from clear (1) to heavy rain/snow (4). Rentals are higher in better weather and on working days compared to non-working days.*
+*This faceted bar plot shows the average number of rentals at 9 AM, grouped by weather conditions on the x-axis and categorized by working or non-working days. Weather conditions range from clear (1) to heavy rain/snow (4). When comparing working days to non-working days, Rentals are higher in better weather.*
 
 \newpage
 
 
 <span style="font-family: Arial; font-size: 14pt; color: red;">
-Problem 3:
+Question 3:
 
 ```{r}
 capmetro_UT <- capmetro_UT |>
@@ -199,7 +198,7 @@ capmetro_UT <- capmetro_UT |>
 
 
 
-Question 1: Faceted Line Graph for Average Boardings
+Part 1: Line Graph for Average Boardings
 
 ```{r}
 # Wrangle data for average boardings
@@ -212,7 +211,7 @@ ggplot(avg_boardings, aes(x = hour_of_day, y = avg_boardings, color = month)) +
   geom_line(size = 1) +
   facet_wrap(~day_of_week, scales = "free_y") +
   labs(
-    title = "Average Boardings by Hour of Day, Day of Week, and Month",
+    title = "Average Boardings",
     x = "Hour of Day",
     y = "Average Boardings",
     color = "Month"
@@ -225,12 +224,12 @@ ggplot(avg_boardings, aes(x = hour_of_day, y = avg_boardings, color = month)) +
 ```
 
 
-*This line graph shows the average number of boardings at different hours of the day, broken down by day of the week and month. The busiest times are usually in the morning (8–9 AM) and evening (5–6 PM), likely due to students commuting to and from campus. Mondays in September have noticeably fewer boardings, possibly because fewer students are on campus at the start of the semester. There’s also a drop in boardings from Wednesday to Friday in November, which could be due to students leaving early for Thanksgiving break or a reduced bus schedule*
+*This line graph shows the average number of boardings at different hours of the day, broken down by day of the week and month. The busiest times are usually in evening from 5-6pm and sometimes in the morning, likely due to students commuting to and from campus. Mondays in September have fewer boardings, possibly because fewer students are on campus at the start of the semester. There’s also a drop in boardings from Wednesday to Friday in November, which could be due to students leaving early for Thanksgiving break or a reduced bus schedule*
 
 \newpage
 
 
-Question 2:
+Part 2:
 
 ```{r}
 # Add weekend status for scatter plot
@@ -272,10 +271,10 @@ billboard_data <- billboard |>
 
 
 <span style="font-family: Arial; font-size: 14pt; color: red;">
-Problem 4:
+Question 4:
 
 <span style="font-family: Arial; font-size: 14pt; color: red;">
-Part A: Top 10 Most Popular Songs by Total Weeks on Billboard Top 100
+Part A: Top 10 Most Popular Songs
 
 ```{r}
 # Calculate total weeks for each song
@@ -289,17 +288,17 @@ top_songs <- billboard_data |>
 knitr::kable(
   top_songs,
   col.names = c("Performer", "Song", "Total Weeks"),
-  caption = "Top 10 most popular songs based on total weeks on Billboard Top 100 since 1958."
+  
 )
 ```
 
-*Table 1: This table lists the top 10 most popular songs based on their total weeks on the Billboard Top 100 since 1958. It includes the performer, song title, and total weeks on the chart.*
+*Table 1: This table lists the top 10 most popular songs based on their total weeks on the Billboard Top 100 since 1958. This table contains the performer, name of the song, and total amount of weeks it was on the chart.*
 
 \newpage
 
 
 <span style="font-family: Arial; font-size: 14pt; color: red;">
-Part B: Musical Diversity Over Time
+Part B: Diversity in Music 
 
 ```{r}
 # Filter data and count unique songs per year
@@ -312,15 +311,14 @@ musical_diversity <- billboard_data |>
 ggplot(musical_diversity, aes(x = year, y = unique_songs)) +
   geom_line(color = "steelblue", size = 1) +
   labs(
-    title = "Musical Diversity of Billboard Top 100 Over Time",
+    title = "Musical Diversity Over Time",
     x = "Year",
     y = "Number of Unique Songs",
-    caption = "This figure shows the number of unique songs on the Billboard Top 100 per year (1959–2020)."
   ) +
   theme_minimal()
 ```
 
-*Figure 1: This line graph illustrates the number of unique songs appearing on the Billboard Top 100 for each year from 1959 to 2020. A trend of increasing musical diversity is observed.*
+*Figure 1: This line graph shows the number of unique songs that appeared on the Billboard Top 100 each year from 1959 to 2020. It shows a general increase in musical diversity over time, meaning more different songs were making it onto the charts. This trend suggests that the music industry has become more varied, with a wider range of artists and styles gaining popularity throughout the years.*
 
 \newpage
 
@@ -350,13 +348,13 @@ ggplot(artists_hits, aes(x = fct_reorder(performer, ten_week_hits_count), y = te
     title = "Artists with the Most Ten-Week Hits",
     x = "Artist",
     y = "Number of Ten-Week Hits",
-    caption = "This figure shows the 19 artists with at least 30 ten-week hits on the Billboard Top 100 since 1958."
+    
   ) +
   theme_minimal()
 ```
 
 
-*Figure 2: This bar chart displays the 19 artists with at least 30 ten-week hits on the Billboard Top 100 since 1958, showcasing their significant impact on the music industry.*
+*Figure 2:  This bar chart shows the 19 artists with at least 30 songs that stayed on the Billboard Top 100 for ten or more weeks since 1958. It highlights their lasting success, strong fan support, and influence in the music industry. These artists have consistently released songs that remained popular for a long time, showing their ability to connect with audiences over the years.*
 
 
 
