@@ -1,0 +1,337 @@
+---
+title: "Homework 3 SDS 315"
+author: "Ryan Paul Clarance"
+date: "2025-02-12"
+output:
+  pdf_document: default
+  html_document: default
+---
+github link: https://github.com/RPC777/Homework-3-SDS315
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(broom)
+library(boot)
+library(dplyr)
+library(mosaic)
+
+set.seed(1234) 
+
+gasprices <- read_csv("Desktop/SDS 313/gasprices.csv")
+head(gasprices)
+nbc_pilotsurvey <- read_csv("Desktop/nbc_pilotsurvey.csv")
+head(nbc_pilotsurvey)
+sclass <- read_csv("Desktop/SDS 313/sclass.csv")
+head(sclass)
+ebay <- read_csv("Desktop/SDS 313/ebay.csv")
+head(ebay)
+```
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Problem 1
+
+```{r}
+# Theory A: Competition vs. Price
+Competition <- do(10000) * diffmean(Price ~ Competitors, data = resample(gasprices))
+
+# Plot the bootstrap distribution
+ggplot(Competition, aes(x = diffmean)) +
+  geom_histogram(binwidth = 0.005, color = "black", fill = "skyblue") +
+  labs(title = "Bootstrap Distribution: Price Difference by Competition",
+       x = "Difference in Mean Price", y = "Frequency")
+
+# Store the confidence interval without printing
+ci <- confint(Competition, level = 0.95)
+
+```
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Theory A:
+
+<span style="font-family: Arial; font-size: 12pt; color: darkblue;">
+*Claim:* Gas stations charge more if they are lacking direct competition in sight.
+
+*Evidence:*Estimated price difference: -0.0235
+95% CI: (-0.0545, 0.0075)
+
+*Conclusion:* The confidence interval includes zero, meaning there is no statistically significant difference in gas prices based on whether or not a gas station has competitors nearby. While the estimate suggests that stations without competitors may charge slightly less, this effect is small and uncertain. Therefore, there is no strong evidence that a lack of competition leads to higher gas prices.
+
+
+```{r}
+gasprices$IncomeGroup <- ifelse(gasprices$Income >= median(gasprices$Income), "High", "Low")
+
+IncomePriceDiff <- do(10000) * diffmean(Price ~ IncomeGroup, data = resample(gasprices))
+
+IncomePriceDiff_df <- data.frame(diffmean = IncomePriceDiff[[1]])
+
+ggplot(IncomePriceDiff_df, aes(x = diffmean)) + 
+  geom_histogram(binwidth = 0.01, color = "black", fill = "lightgreen") +
+  labs(title = "Bootstrap Distribution: Difference in Means (High vs. Low Income)",
+       x = "Difference in Means", y = "Frequency")
+
+confint(IncomePriceDiff, level = 0.95)
+```
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Theory B:
+
+*Claim:* The richer the area, the higher the gas prices.
+
+*Evidence:*Estimated price difference: -0.0346
+95% CI: (-0.0648, -0.0038)
+
+*Conclusion:* The confidence interval includes both negative and positive values, meaning the true correlation between income and gas prices could be positive, negative, or nonexistent. While the estimate suggests a moderate positive correlation (0.396), the uncertainty is too large to confidently say that income levels affect gas prices. There is no strong evidence that wealthier areas have systematically higher gas prices.
+
+
+```{r}
+# Theory C: Stoplight vs. Price
+Stoplight <- do(10000) * diffmean(Price ~ Stoplight, data = resample(gasprices))
+
+ggplot(Stoplight, aes(x = diffmean)) +
+  geom_histogram(binwidth = 0.005, color = "black", fill = "orange") +
+  labs(title = "Bootstrap Distribution: Price Difference by Stoplight",
+       x = "Difference in Mean Price", y = "Frequency")
+
+confint(Stoplight, level = 0.95)
+
+```
+
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Theory C:
+
+*Claim:* Gas stations at stoplights charge more.
+
+*Evidence:*Estimated price difference: -0.0033
+95% CI: (-0.0385, 0.0304)
+
+*Conclusion:* The confidence interval contains zero, meaning gas stations at stoplights do not consistently charge more than those without stoplights. The small estimated difference in price (-0.0033) is practically insignificant. There is no statistical evidence to support the claim that stoplights affect gas prices.
+
+
+```{r}
+# Theory D: Highway Access vs. Price
+Highway <- do(10000) * diffmean(Price ~ Highway, data = resample(gasprices))
+
+ggplot(Highway, aes(x = diffmean)) +
+  geom_histogram(binwidth = 0.005, color = "black", fill = "purple") +
+  labs(title = "Bootstrap Distribution: Price Difference by Highway Access",
+       x = "Difference in Mean Price", y = "Frequency")
+confint(Highway, level = 0.95)
+
+```
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Theory D:
+
+*Claim:* Gas stations with direct highway access charge more.
+
+*Evidence:*Estimated price difference: 0.0457
+95% CI: (0.0088, 0.0822)
+
+*Conclusion:* The confidence interval does not contain zero, meaning gas stations with highway access do tend to charge more than those without. The estimated price increase (0.0457 per gallon) is small but statistically significant. This makes sense as highway stations often serve travelers with fewer options, allowing them to charge a premium. The data supports this theory.
+
+
+
+```{r}
+# Theory E: Shell vs. Other Brands
+Shell <- do(10000) * diffmean(Price ~ (Brand == 'Shell'), data = resample(gasprices))
+
+ggplot(Shell, aes(x = diffmean)) +
+  geom_histogram(binwidth = 0.005, color = "black", fill = "red") +
+  labs(title = "Bootstrap Distribution: Price Difference for Shell",
+       x = "Difference in Mean Price", y = "Frequency")
+confint(Shell, level = 0.95)
+
+```
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Theory E:
+
+*Claim:* Shell charges more than all other brands..
+
+*Evidence:*Estimated price difference: 0.0274
+95% CI: (-0.0105, 0.0650)
+
+*Conclusion:* The confidence interval includes zero, meaning there is no strong evidence that Shell consistently charges more than its competitors. While the estimate suggests a small price premium for Shell stations, the variability is too large to draw firm conclusions. Shell may charge more, but the data does not confirm this effect with statistical confidence.
+
+\newpage
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Problem 2
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+*Part A:* Mileage of 2011 S-Class 63 AMG
+
+```{r}
+# Filter data for 2011 S-Class 63 AMG
+amg2011 <- subset(sclass, year == 2011 & trim == "63 AMG")
+
+MileageCI <- do(10000) * mean(~mileage, data = resample(amg2011))
+
+ggplot(MileageCI, aes(x = mean)) +
+  geom_histogram(binwidth = 1000, color = "black", fill = "blue") +
+  labs(title = "Bootstrap Distribution: Average Mileage (2011 S-Class 63 AMG)",
+       x = "Average Mileage", y = "Frequency")
+
+confint(MileageCI, level = 0.95)
+```
+
+
+95% CI for average mileage: (26,260.45, 31,809.16)
+
+*Conclusion:* Based on the sample of 116 vehicles, the estimated average mileage for 2011 S-Class 63 AMG cars on the used market is 28,997 miles. Since the confidence interval is relatively wide, we acknowledge some uncertainty, but this provides a reasonable estimate of the expected mileage range for similar vehicles. This range can help potential buyers gauge the expected wear and tear for this model.
+
+\newpage
+
+<span style="font-family: Arial; font-size: 14pt; color: red;">
+Part B: Proportion of 2014 S-Class 550s that are Black
+
+```{r}
+sclass2014 <- subset(sclass, year == 2014 & trim == "550")
+
+sclass2014$isBlack <- sclass2014$color == "Black"
+
+BlackProp <- do(10000) * prop(~isBlack, data = resample(sclass2014))
+
+BlackProp_df <- data.frame(prop = BlackProp[[1]])
+
+ggplot(BlackProp_df, aes(x = prop)) +
+  geom_histogram(binwidth = 0.01, color = "black", fill = "red") +
+  labs(title = "Bootstrap Distribution: Proportion of Black Cars (2014 S-Class 550)",
+       x = "Proportion", y = "Frequency")
+
+quantile(BlackProp_df$prop, probs = c(0.025, 0.975))
+
+
+```
+*Conclusion:*This 95% confidence interval suggests that the true proportion of 2014 S-Class 550 cars that were painted black is likely between 41.7% and 45.3%. In other words, if we were to repeatedly sample similar groups of 2014 S-Class 550 cars and calculate the proportion of black cars each time, about 95% of those confidence intervals would contain the true population proportion. The interval is relatively narrow, which indicates a good level of precision in the estimate, likely due to the large sample size of 2889 cars.
+
+\newpage
+
+Problem 3
+
+Part A-Who makes people happier – "Living with Ed" or "My Name is Earl"?
+
+```{r}
+ed_earl <- subset(nbc_pilotsurvey, Show %in% c("Living with Ed", "My Name is Earl"))
+
+HappyDiff <- do(10000) * diffmean(Q1_Happy ~ Show, data = resample(ed_earl))
+
+ggplot(HappyDiff, aes(x = diffmean)) +
+  geom_histogram(binwidth = 0.05, color = "black", fill = "skyblue") +
+  labs(title = "Bootstrap Distribution: Q1_Happy Difference (Ed vs. Earl)",
+       x = "Difference in Mean Q1_Happy", y = "Frequency")
+
+confint(HappyDiff, level = 0.95)
+```
+
+*Question:* Do viewers of Living with Ed or My Name is Earl report higher happiness scores?
+
+*Approach:* A bootstrap confidence interval was calculated for the difference in mean Q1_Happy scores between the two shows. This approach is suitable for comparing the central tendencies of the two groups while accounting for variability in the data.
+
+*Results:*
+* Estimated Difference: -0.1491
+* 95% Confidence Interval: (-0.4014, 0.1035)
+
+*Conclusion:*The confidence interval includes zero, suggesting no statistically significant difference in happiness scores between viewers of the two shows. Although My Name is Earl appears to have slightly higher average happiness scores, the data does not provide enough evidence to conclude that it genuinely makes viewers happier than Living with Ed. The overlap in confidence intervals indicates that any observed difference could be due to sampling variability rather than a true effect. Therefore, NBC might not have strong grounds to favor one show over the other based on viewer happiness alone.
+
+\newpage
+
+Part B- Which reality show is more annoying – "Biggest Loser" or "The Apprentice: LA"?
+
+```{r}
+loser_apprentice <- subset(nbc_pilotsurvey, Show %in% c("The Biggest Loser", "The Apprentice: Los Angeles"))
+
+AnnoyedDiff <- do(10000) * diffmean(Q1_Annoyed ~ Show, data = resample(loser_apprentice))
+
+ggplot(AnnoyedDiff, aes(x = diffmean)) +
+  geom_histogram(binwidth = 0.05, color = "black", fill = "orange") +
+  labs(title = "Bootstrap Distribution: Q1_Annoyed Difference (Loser vs. Apprentice)",
+       x = "Difference in Mean Q1_Annoyed", y = "Frequency")
+
+confint(AnnoyedDiff, level = 0.95)
+```
+
+
+*Question:* Do viewers of Biggest Loser or The Apprentice: LA report higher annoyance scores?
+
+*Approach:* A bootstrap confidence interval was calculated for the difference in mean Q1_Annoyed scores between the two shows. This method helps estimate the uncertainty around the difference in annoyance levels.
+
+*Results:*
+
+*Estimated Difference:* -0.2710
+95% Confidence Interval: (-0.5216, -0.0197)
+
+*Conclusion:*
+The confidence interval does not include zero, providing strong evidence that The Apprentice: LA is perceived as more annoying than Biggest Loser. This could be due to the competitive and conflict-driven nature of The Apprentice: LA, which may provoke more frustration or irritation among viewers. In contrast, Biggest Loser might be seen as more inspirational or motivating, leading to lower annoyance scores. These findings could inform programming decisions, as NBC may want to consider the potential polarizing impact of The Apprentice: LA on its audience.
+
+\newpage
+
+Part C-How many people find "Dancing with the Stars" confusing?
+
+```{r}
+dancing <- subset(nbc_pilotsurvey, Show == "Dancing with the Stars")
+
+ConfusingProp <- do(10000) * prop(~ (Q2_Confusing >= 4), data = resample(dancing))
+
+colnames(ConfusingProp) <- "prop"
+
+ConfusingProp_df <- data.frame(prop = ConfusingProp[[1]])
+
+ggplot(ConfusingProp, aes(x = prop)) +
+  geom_histogram(binwidth = 0.01, color = "black", fill = "purple") +
+  labs(title = "Bootstrap Distribution: Proportion Q2_Confusing ≥ 4 (Dancing with the Stars)",
+       x = "Proportion", y = "Frequency")
+quantile(ConfusingProp_df$prop, probs = c(0.025, 0.975))
+```
+*Question:* What proportion of viewers find "Dancing with the Stars" confusing, with a rating of 4 or higher on the Q2_Confusing scale?
+
+*Approach:* A bootstrap confidence interval was calculated for the proportion of viewers who rated their confusion as 4 or higher on a given scale.
+
+*Results:* The estimated proportion of viewers who found "Dancing with the Stars" confusing is approximately 7.73% (mean of the bootstrap distribution).
+95% Confidence Interval: (0.039, 0.116)
+
+*Conclusion:* The confidence interval indicates that between 3.9% and 11.6% of viewers found the show confusing. Since the interval does not include zero, there is evidence to suggest that a non-negligible portion of the audience experienced confusion while watching the show. This may point to potential issues with the show's format, narrative complexity, or presentation style. If the producers aim to enhance viewer satisfaction and engagement, they might consider simplifying the structure or improving the clarity of explanat
+
+\newpage
+
+Problem 4: eBay AdWords Experiment
+
+```{r}
+ebay <- ebay |>
+  mutate(rev_ratio = rev_after / rev_before)
+
+treatment <- filter(ebay, adwords_pause == 1)
+control <- filter(ebay, adwords_pause == 0)
+
+obs_diff <- mean(treatment$rev_ratio) - mean(control$rev_ratio)
+
+boot_diff <- do(10000) * (mean(~rev_ratio, data = resample(treatment)) - 
+                          mean(~rev_ratio, data = resample(control)))
+
+colnames(boot_diff) <- "diff"
+
+ggplot(boot_diff, aes(x = diff)) +
+  geom_histogram(binwidth = 0.01, color = "black", fill = "gold") +
+  labs(title = "Bootstrap Distribution: Difference in Revenue Ratio",
+       x = "Difference in Revenue Ratio", y = "Frequency")
+
+confint(boot_diff, level = 0.95)
+
+obs_diff
+```
+
+*Question:* Does pausing Google AdWords affect eBay’s revenue?  
+
+**Approach:** A bootstrap confidence interval was calculated for the difference in the revenue ratio based on between the treatment group (ads paused) and the control group (ads active). This approach allows for the comparison of relative changes in revenue while accounting for variability across different DMAs.  
+
+*Results:*  
+- *Estimated Difference:* -0.0523  
+- *95% Confidence Interval:* (-0.0909, -0.0133)  
+
+*Conclusion:*
+The confidence interval does not include zero, indicating strong evidence that pausing AdWords led to a decrease in eBay’s revenue. This suggests that paid search advertising on Google effectively drives incremental sales by attracting customers who might not visit eBay organically. The negative impact on revenue highlights the importance of maintaining a visible online presence through paid search, even for a well-known brand like eBay.  
+For eBay, the cost of Google AdWords appears justified by the additional revenue it generates. This finding has strategic implications, suggesting that eBay should continue investing in paid search to sustain its competitive advantage and customer acquisition funnel. Furthermore, the experiment demonstrates the value of data-driven decision-making in evaluating marketing effectiveness, and eBay might consider similar experiments to optimize its digital marketing budget.
